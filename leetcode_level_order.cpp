@@ -11,8 +11,6 @@ typedef struct TreeNode {
      TreeNode(int x) : val(x), left(NULL), right(NULL) {}
 }TreeNode;
 
-map<int,vector<int>> level_map;
-
 class Solution {
 public:
 
