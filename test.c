@@ -7,12 +7,15 @@
 #include <queue>
 #include <string>
 
-
 using namespace std;
 
 
 void read_input(){
+    char val;
     
+    cin>>val;
+    
+    cout<<val<<endl;
 }
 
 int main()
@@ -20,8 +23,3 @@ int main()
     read_input();
     return 0;
 }
-
-
-
-
-
