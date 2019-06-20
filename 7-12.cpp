@@ -16,13 +16,17 @@ class Graph
   
     // Pointer to an array containing adjacency listsList 
     list<int> *adj; 
-  
+    vector<vector<int> > time_table;
+    vector<int> earliest_time;
+    
 public: 
     Graph(int V);   // Constructor 
   
     // function to add an edge to graph 
     void addEdge(int u, int v); 
-  
+
+    void addTime(int u, int v,int t);
+
     // prints a Topological Sort of the complete graph 
     bool topologicalSort(); 
 }; 
@@ -30,78 +34,73 @@ public:
 Graph::Graph(int V) 
 { 
     this->V = V; 
-    adj = new list<int>[V]; 
-} 
+    adj = new list<int>[V];
+    time_table.resize(V,vector<int>(V));
+    earliest_time.resize(V,0);
+    
+}
   
 void Graph::addEdge(int u, int v) 
 { 
     adj[u].push_back(v); 
-} 
-  
-// The function to do Topological Sort. 
+}
+
+void Graph::addTime(int u, int v,int t){
+    time_table[u][v] = t;
+}
+
+
+ 
 bool Graph::topologicalSort() 
 { 
-    // Create a vector to store indegrees of all 
-    // vertices. Initialize all indegrees as 0. 
     vector<int> in_degree(V, 0); 
   
-    // Traverse adjacency lists to fill indegrees of 
-    // vertices.  This step takes O(V+E) time 
     for (int u=0; u<V; u++) 
     { 
         for (auto it:adj[u]) {
             in_degree[it]++;
         }
-    } 
+    }
   
-    // Create an queue and enqueue all vertices with 
-    // indegree 0 
     queue<int> q; 
     for (int i = 0; i < V; i++) 
         if (in_degree[i] == 0) 
             q.push(i); 
   
-    // Initialize count of visited vertices 
     int cnt = 0; 
   
-    // Create a vector to store result (A topological 
-    // ordering of the vertices) 
     vector <int> top_order; 
   
-    // One by one dequeue vertices from queue and enqueue 
-    // adjacents if indegree of adjacent becomes 0 
     while (!q.empty()) 
     { 
-        // Extract front of queue (or perform dequeue) 
-        // and add it to topological order 
         int u = q.front(); 
         q.pop(); 
-        top_order.push_back(u); 
+        top_order.push_back(u);
   
-        // Iterate through all its neighbouring nodes 
-        // of dequeued node u and decrease their in-degree 
-        // by 1 
         for (auto it:adj[u]){
-            if (--in_degree[it] == 0) {
-                q.push(it);
+            auto v = it;
+            if (--in_degree[v] == 0) {
+                q.push(v);
             }
+            earliest_time[v] = max(earliest_time[u] + time_table[u][v],earliest_time[v]);
         }
-  
-            // If in-degree becomes zero, add it to queue 
   
         cnt++; 
     } 
   
-    // Check if there was a cycle 
     if (cnt != V) 
     { 
         return false; 
     }
-  
-    // Print topological order 
-    for (int i=0; i<top_order.size(); i++) 
-        cout << top_order[i] << " "; 
-    cout << endl; 
+
+    int max = 0;
+    for(auto it:earliest_time){
+        if(it > max){
+            max = it;
+        }
+    }
+    
+    printf("%d",max);
     
     return true;
 } 
@@ -115,6 +114,7 @@ void read_input(){
         int x,y,l;
         cin>>x>>y>>l;
         g.addEdge(x,y);
+        g.addTime(x,y,l);
     }
     
     auto ret = g.topologicalSort(); 
